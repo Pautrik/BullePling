@@ -21,7 +21,7 @@ async function run() {
     let registration;
     try {
         registration = await navigator.serviceWorker
-            .register(`${window.location.pathname}/worker`);
+            .register(`${window.location.pathname}worker.js`);
     } catch(err) {
         alert(`Couldn't subscribe, failed to register service worker`);
         return;
