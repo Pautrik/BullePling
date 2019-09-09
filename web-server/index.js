@@ -19,6 +19,7 @@ app.get('/public-vapid-key', (req, res) => {
 });
 
 app.post('/subscribe', (req, res) => {
+    const { endpoint, keys: { p256dh, auth } } = req.body;
     const hasValue = str =>
         str != null && str != "";
 
