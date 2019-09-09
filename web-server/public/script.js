@@ -1,7 +1,8 @@
 let publicVapidKey;
 
 async function init() {
-    publicVapidKey = await fetch('/public-vapid-key');
+    const res= await fetch('/public-vapid-key');
+    publicVapidKey = await res.text();
 }
 
 function subscribe() {
