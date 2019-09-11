@@ -49,7 +49,14 @@ function getSubs() {
     return new Promise((resolve, reject) => {
         db.all(
             `SELECT endpoint, p256dh, auth FROM ${tableName};`,
-            (err, rows) => err ? reject(err) : resolve(rows)
+            (err, rows) => {
+	        if(err) {
+		    reject(err);
+		    return;
+		}
+		const formRows = rows.map(({ endpoint, p256dh, auth }) => ({ endpoint, keys: { p256dh, auth } }));
+		resolve(formRows);
+	    }
         );
     });
 }
