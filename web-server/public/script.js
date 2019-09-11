@@ -5,20 +5,62 @@ async function init() {
     publicVapidKey = await res.text();
 }
 
-function subscribe() {
+async function subscribe() {
     if('serviceWorker' in navigator) {
         console.log('Registering service worker');
 
-        run()
-            .then(() => console.log('Service worker registred'))
-            .catch(error => alert(error));
+        try {
+            navigator.serviceWorker.register(`${window.location.pathname}worker.js`);
+        } catch(err) {
+            alert(`Couldn't subscribe, failed to register service worker`);
+            return;
+        }
+        console.log('Service worker registred');
+	
+        const registration = await navigator.serviceWorker.ready;
+
+        let subscription;
+        try {
+            subscription = await registration.pushManager
+                .subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+                });
+        } catch(err) {
+            alert(`Couldn't subscribe, failed to register push manager`);
+            return;
+        }
+	try {
+            const resp = await fetch('/subscribe', {
+                method: 'POST',
+                body: JSON.stringify(subscription.toJSON()),// Body is fucked up
+                headers: {
+                    'content-type': 'application/json'
+                }
+            });
+	
+            if(!resp.ok) {
+                switch(resp.status) {
+                    case 400:
+                        alert('Failed to subscribe, invalid parameters');
+                        break;
+                    case 500:
+                        alert('Failed to subscribe, internal server error');
+                        break;
+                    default:
+                        alert('Failed to subscribe, an error occured');
+                }
+	    }
+        } catch(e) {
+            alert('Failed to subscribe, an error occured');
+        }
     }
     else {
         alert(`Browser doesn't support service workers, unable to subscribe to notifications`);
     }
 }
 
-async function run() {
+/*async function run() {
     let registration;
     try {
         registration = await navigator.serviceWorker
@@ -48,21 +90,23 @@ async function run() {
                 'content-type': 'application/json'
             }
         });
-
-        switch(resp.status) {
-            case 400:
-                alert('Failed to subscribe, invalid parameters');
-                break;
-            case 500:
-                alert('Failed to subscribe, internal server error');
-                break;
-            default:
-                alert('Failed to subscribe, an error occured');
-        }
+	
+	if(!resp.ok) {
+            switch(resp.status) {
+                case 400:
+                    alert('Failed to subscribe, invalid parameters');
+                    break;
+                case 500:
+                    alert('Failed to subscribe, internal server error');
+                    break;
+                default:
+                    alert('Failed to subscribe, an error occured');
+            }
+	}
     } catch(e) {
         alert('Failed to subscribe, an error occured');
     }
-}
+}*/
 
 // Function from https://www.npmjs.com/package/web-push#using-vapid-key-for-applicationserverkey
 function urlBase64ToUint8Array(base64String) {
