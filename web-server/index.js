@@ -28,7 +28,7 @@ app.post('/subscribe', (req, res) => {
         db.setSub(req.body)
             .then(() => {
                 res.status(201).send();
-                sendNotification(req.body, { msg: 'Successfully subscribed to notifications' });
+                sendNotification(req.body, { title: 'BullePling', body: 'Successfully subscribed to notifications' });
             })
             .catch(err => res.status(500).send());
     }
