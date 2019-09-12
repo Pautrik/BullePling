@@ -49,7 +49,7 @@ h1 {
     display: flex;
     padding: 20px;
     max-width: 90vw;
-    min-width: 300px;
+    min-width: 550px;
     width: 40vw;
     justify-content: center;
     font-size: 2em;
@@ -62,12 +62,15 @@ button {
     font-family: sans;
     font-weight: 700;
     background-color: #eee;
-    padding: 1em;
+    padding: 0.5em;
 }
 
 @media only screen and (orientation: portrait) and (min-width: 600px) {
+    h1 {
+        font-size: 11vw;
+    }
     .button-container, button {
-        font-size: 4vh;
+        font-size: 7vw;
     }
     .button-container {
         width: 75vw;
