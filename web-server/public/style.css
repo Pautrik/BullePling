@@ -38,11 +38,11 @@ html, body {
 h1 {
     font-family: sans;
     font-size: 4em;
-    color: #222;
+    color: #333;
 }
 
 .button-container, button {
-    font-size: 2em;
+    font-size: 1.5em;
 }
 
 .button-container {
@@ -62,7 +62,7 @@ button {
     font-family: sans;
     font-weight: 700;
     background-color: #eee;
-    padding: 0.5em;
+    padding: 1em;
 }
 
 @media only screen and (orientation: portrait) and (min-width: 600px) {
@@ -74,9 +74,5 @@ button {
     }
     .button-container {
         width: 75vw;
-    }
-
-    button {
-        padding: 1em;
     }
 }
