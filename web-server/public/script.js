@@ -1,74 +1,33 @@
 let publicVapidKey;
 
 async function init() {
-    const res= await fetch('/public-vapid-key');
+    const res = await fetch('/public-vapid-key');
     publicVapidKey = await res.text();
 }
 
 async function subscribe() {
-    if('serviceWorker' in navigator) {
-        console.log('Registering service worker');
-
-        try {
-            navigator.serviceWorker.register(`${window.location.pathname}worker.js`);
-        } catch(err) {
-            alert(`Couldn't subscribe, failed to register service worker`);
-            return;
-        }
-        console.log('Service worker registred');
-	
-        const registration = await navigator.serviceWorker.ready;
-
-        let subscription;
-        try {
-            subscription = await registration.pushManager
-                .subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
-                });
-        } catch(err) {
-            alert(`Couldn't subscribe, failed to register push manager`);
-            return;
-        }
-	try {
-            const resp = await fetch('/subscribe', {
-                method: 'POST',
-                body: JSON.stringify(subscription.toJSON()),// Body is fucked up
-                headers: {
-                    'content-type': 'application/json'
-                }
-            });
-	
-            if(!resp.ok) {
-                switch(resp.status) {
-                    case 400:
-                        alert('Failed to subscribe, invalid parameters');
-                        break;
-                    case 500:
-                        alert('Failed to subscribe, internal server error');
-                        break;
-                    default:
-                        alert('Failed to subscribe, an error occured');
-                }
-	    }
-        } catch(e) {
-            alert('Failed to subscribe, an error occured');
-        }
-    }
-    else {
+    if (!'serviceWorker' in navigator) {
         alert(`Browser doesn't support service workers, unable to subscribe to notifications`);
+        return;
     }
-}
 
-/*async function run() {
-    let registration;
+    if (!'PushManager' in window) {
+        alert(`Browser doesn't support web push, unable to subscribe to notifications`);
+        return;
+    }
+
+    console.log('Trying to register service worker');
+
     try {
-        registration = await navigator.serviceWorker
-            .register(`${window.location.pathname}worker.js`);
-    } catch(err) {
+        navigator.serviceWorker.register(`${window.location.pathname}worker.js`);
+        console.log('Service worker successfully registred');
+    } catch (err) {
         alert(`Couldn't subscribe, failed to register service worker`);
         return;
     }
+
+
+    const registration = await navigator.serviceWorker.ready;
 
     let subscription;
     try {
@@ -77,7 +36,7 @@ async function subscribe() {
                 userVisibleOnly: true,
                 applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
             });
-    } catch(err) {
+    } catch (err) {
         alert(`Couldn't subscribe, failed to register push manager`);
         return;
     }
@@ -90,9 +49,9 @@ async function subscribe() {
                 'content-type': 'application/json'
             }
         });
-	
-	if(!resp.ok) {
-            switch(resp.status) {
+
+        if (!resp.ok) {
+            switch (resp.status) {
                 case 400:
                     alert('Failed to subscribe, invalid parameters');
                     break;
@@ -102,11 +61,11 @@ async function subscribe() {
                 default:
                     alert('Failed to subscribe, an error occured');
             }
-	}
-    } catch(e) {
+        }
+    } catch (e) {
         alert('Failed to subscribe, an error occured');
     }
-}*/
+}
 
 // Function from https://www.npmjs.com/package/web-push#using-vapid-key-for-applicationserverkey
 function urlBase64ToUint8Array(base64String) {
@@ -118,19 +77,19 @@ function urlBase64ToUint8Array(base64String) {
     const rawData = window.atob(base64);
     const outputArray = new Uint8Array(rawData.length);
 
-    for(let i = 0; i < rawData.length; ++i) {
+    for (let i = 0; i < rawData.length; ++i) {
         outputArray[i] = rawData.charCodeAt(i);
     }
     return outputArray;
 }
 
 async function unsubscribe() {
-    if('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator) {
         console.log("Removing service worker");
         const reg = await navigator.serviceWorker.getRegistration();
-        if(typeof reg !== "undefined") {
+        if (typeof reg !== "undefined") {
             const sub = await reg.pushManager.getSubscription();
-            if(typeof sub !== "undefined") {
+            if (typeof sub !== "undefined") {
                 fetch("/unsubscribe", {
                     method: "POST",
                     headers: {
