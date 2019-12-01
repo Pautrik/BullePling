@@ -5,7 +5,7 @@ const { removeSub } = require('../db')
 const publicVapidKey = process.env.PUBLIC_VAPID_KEY;
 const privateVapidKey = process.env.PRIVATE_VAPID_KEY;
 
-webPush.setVapidDetails('mailto:patema@student.chalmers.se', publicVapidKey, privateVapidKey);
+webPush.setVapidDetails(`mailto:${process.env.EMAIL_ADRESS}`, publicVapidKey, privateVapidKey);
 
 async function sendNotification(sub, payload) {
     try {
