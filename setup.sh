@@ -9,6 +9,7 @@ cd ../notification-manager
 npm i
 cd ../web-server
 npm i
+cd ..
 
 # 2. Generates web-push keys
 RAW_OUTPUT="$(npx web-push generate-vapid-keys --json)"
